@@ -25,6 +25,8 @@ int transbordo(ArvoreB*, No*);
 No* divideNo(ArvoreB*, No*);
 void adicionaChaveRecursivo(ArvoreB*, No*, No*, int);
 void adicionaChave(ArvoreB*, int);
+void removerChave(ArvoreB*, int);
+void removerChaveNo(ArvoreB*, No*, int);
 
 ArvoreB* criaArvore(int ordem) {
   ArvoreB* a = malloc(sizeof(ArvoreB));
@@ -190,6 +192,38 @@ void adicionaChave(ArvoreB* arvore, int chave) {
   adicionaChaveRecursivo(arvore, no, NULL, chave);
 }
 
+void removerChave(ArvoreB* arvore, int chave) {
+  No* no = localizaNo(arvore, chave);
+
+  removerChaveNo(arvore, no, chave);
+}
+
+void removerChaveNo(ArvoreB* arvore, No* no, int chave) {
+  contador++;
+  if (no == NULL) return;
+
+  int i = pesquisaBinaria(no, chave);
+
+  contador++;
+  if (i < no->total && no->chaves[i] == chave) {
+    contador++;
+    for (int j = i; j < no->total - 1; j++) {
+      contador++;
+      no->chaves[j] = no->chaves[j + 1];
+      no->filhos[j + 1] = no->filhos[j + 2];
+    }
+    no->total--;
+
+    // Verificar se é necessário realizar balanceamento
+    if (no->total < arvore->ordem && no->pai != NULL) {
+      // Implementar lógica de balanceamento aqui
+    }
+    contador++;
+  } else {
+    removerChaveNo(arvore, no->filhos[i], chave);
+  }
+}
+
 int main() {
   for (int j = 0; j < 30; j++) {
     ArvoreB* arvore = criaArvore(5);
@@ -199,20 +233,20 @@ int main() {
     contador = 0;
 
     for (int i = 0; i < 10000; i++) {
-      int operacao = 0;
+      int operacao = rand() % 2;  // 0 ou 1
       int valor = rand() % 100000;
 
       switch (operacao) {
         case 0:
           adicionaChave(arvore, valor);
           break;
-          // case 1:
-          //   remover(a, valor);
-          //   break;
+        case 1:
+          removerChave(arvore, valor);
+          break;
       }
     }
 
-    //   percorreArvore(arvore->raiz);
+    percorreArvore(arvore->raiz);
     printf("\nNumero de operacoes: %d\n", contador);
   }
 }

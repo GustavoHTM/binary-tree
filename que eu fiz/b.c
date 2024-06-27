@@ -192,7 +192,7 @@ void adicionaChave(ArvoreB* arvore, int chave) {
 
 int main() {
   for (int j = 0; j < 30; j++) {
-    ArvoreB* arvore = criaArvore(1);
+    ArvoreB* arvore = criaArvore(5);
     sleep(1);
     srand(time(0));
 
@@ -214,6 +214,5 @@ int main() {
 
     //   percorreArvore(arvore->raiz);
     printf("\nNumero de operacoes: %d\n", contador);
-    contador = 0;
   }
 }

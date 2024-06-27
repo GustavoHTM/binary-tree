@@ -28,6 +28,8 @@ int vazia(Arvore*);
 No* adicionar(Arvore*, int);
 No* localizar(Arvore* arvore, int valor);
 
+int contador = 0;
+
 Arvore* criar() {
   Arvore* arvore = malloc(sizeof(Arvore));
   arvore->nulo = NULL;
@@ -39,7 +41,10 @@ Arvore* criar() {
   return arvore;
 }
 
-int vazia(Arvore* arvore) { return arvore->raiz == NULL; }
+int vazia(Arvore* arvore) {
+  contador++;
+  return arvore->raiz == NULL;
+}
 
 No* criarNo(Arvore* arvore, No* pai, int valor) {
   No* no = malloc(sizeof(No));
@@ -54,21 +59,27 @@ No* criarNo(Arvore* arvore, No* pai, int valor) {
 
 No* adicionarNo(Arvore* arvore, No* no, int valor) {
   if (valor > no->valor) {
+    contador++;
     if (no->direita == arvore->nulo) {
       no->direita = criarNo(arvore, no, valor);
       no->direita->cor = Vermelho;
 
+      contador++;
       return no->direita;
     } else {
+      contador++;
       return adicionarNo(arvore, no->direita, valor);
     }
   } else {
+    contador++;
     if (no->esquerda == arvore->nulo) {
       no->esquerda = criarNo(arvore, no, valor);
       no->esquerda->cor = Vermelho;
 
+      contador++;
       return no->esquerda;
     } else {
+      contador++;
       return adicionarNo(arvore, no->esquerda, valor);
     }
   }
@@ -92,10 +103,14 @@ No* localizar(Arvore* arvore, int valor) {
   if (!vazia(arvore)) {
     No* no = arvore->raiz;
 
+    contador++;
     while (no != arvore->nulo) {
+      contador++;
       if (no->valor == valor) {
+        contador++;
         return no;
       } else {
+        contador++;
         no = valor < no->valor ? no->esquerda : no->direita;
       }
     }
@@ -134,7 +149,9 @@ void percorrerProfundidadePosOrder(Arvore* arvore, No* no,
 void visitar(int valor) { printf("%d ", valor); }
 
 void balancear(Arvore* arvore, No* no) {
+  contador++;
   while (no->pai->cor == Vermelho) {
+    contador++;
     if (no->pai == no->pai->pai->esquerda) {
       No* tio = no->pai->pai->direita;
 
@@ -153,7 +170,9 @@ void balancear(Arvore* arvore, No* no) {
           no->pai->pai->cor = Vermelho;             // Caso 3
           rotacionarDireita(arvore, no->pai->pai);  // Caso 3
         }
+        contador++;
       }
+      contador++;
     } else {
       No* tio = no->pai->pai->esquerda;
 
@@ -172,8 +191,11 @@ void balancear(Arvore* arvore, No* no) {
           no->pai->pai->cor = Vermelho;              // Caso 3
           rotacionarEsquerda(arvore, no->pai->pai);  // Caso 3
         }
+        contador++;
       }
+      contador++;
     }
+    contador++;
   }
   arvore->raiz->cor = Preto;  // Conserta possível quebra regra 2
 }
@@ -185,14 +207,18 @@ void rotacionarEsquerda(Arvore* arvore, No* no) {
   if (direita->esquerda != arvore->nulo) {
     direita->esquerda->pai = no;
   }
+  contador++;
 
   direita->pai = no->pai;
 
   if (no->pai == arvore->nulo) {
+    contador++;
     arvore->raiz = direita;
   } else if (no == no->pai->esquerda) {
+    contador += 2;
     no->pai->esquerda = direita;
   } else {
+    contador += 2;
     no->pai->direita = direita;
   }
 
@@ -207,14 +233,18 @@ void rotacionarDireita(Arvore* arvore, No* no) {
   if (esquerda->direita != arvore->nulo) {
     esquerda->direita->pai = no;
   }
+  contador++;
 
   esquerda->pai = no->pai;
 
   if (no->pai == arvore->nulo) {
+    contador++;
     arvore->raiz = esquerda;
   } else if (no == no->pai->esquerda) {
+    contador += 2;
     no->pai->esquerda = esquerda;
   } else {
+    contador += 2;
     no->pai->direita = esquerda;
   }
 
@@ -223,24 +253,26 @@ void rotacionarDireita(Arvore* arvore, No* no) {
 }
 
 int main() {
-  Arvore* a = criar();
+  for (int j = 0; j < 30; j++) {
+    Arvore* a = criar();
+    sleep(1);
+    srand(time(0));
 
-  for (int i = 0; i < 1000; i++) {
-    int operacao = 0;
-    int valor = rand() % 100000;
+    contador = 0;
 
-    switch (operacao) {
-      case 0:
-        adicionar(a, valor);
-        break;
-        // case 1:
-        //   remover(a, valor);
-        //   break;
+    for (int i = 0; i < 10000; i++) {
+      int operacao = 0;
+      int valor = rand() % 100000;
+
+      switch (operacao) {
+        case 0:
+          adicionar(a, valor);
+          break;
+      }
     }
-  }
 
-  printf("In-order: ");
-  percorrerProfundidadeInOrder(a, a->raiz, visitar);
+    printf("\nNumero de operacoes: %d\n", contador);
+  }
 
   return 0;
 }

@@ -27,6 +27,7 @@ void adicionaChaveRecursivo(ArvoreB*, No*, No*, int);
 void adicionaChave(ArvoreB*, int);
 void removerChave(ArvoreB*, int);
 void removerChaveNo(ArvoreB*, No*, int);
+void balancearNo(ArvoreB*, No*);
 
 ArvoreB* criaArvore(int ordem) {
   ArvoreB* a = malloc(sizeof(ArvoreB));
@@ -216,13 +217,162 @@ void removerChaveNo(ArvoreB* arvore, No* no, int chave) {
 
     // Verificar se é necessário realizar balanceamento
     if (no->total < arvore->ordem && no->pai != NULL) {
-      // Implementar lógica de balanceamento aqui
+      balancearNo(arvore, no);
     }
     contador++;
   } else {
     removerChaveNo(arvore, no->filhos[i], chave);
   }
 }
+
+void balancearNo(ArvoreB* arvore, No* no) {
+  No* pai = no->pai;
+  int posicaoNo = 0;
+
+  contador++;
+  while (pai->filhos[posicaoNo] != no) {
+    posicaoNo++;
+    contador++;
+  }
+
+  No* irmaoEsquerdo = posicaoNo > 0 ? pai->filhos[posicaoNo - 1] : NULL;
+  contador++;
+  No* irmaoDireito = posicaoNo < pai->total ? pai->filhos[posicaoNo + 1] : NULL;
+  contador++;
+
+  // Tenta a redistribuição
+  if (irmaoEsquerdo != NULL && irmaoEsquerdo->total > arvore->ordem) {
+    contador++;
+    for (int i = no->total; i > 0; i--) {
+      no->chaves[i] = no->chaves[i - 1];
+      no->filhos[i + 1] = no->filhos[i];
+      contador++;
+    }
+    contador++;
+    no->filhos[1] = no->filhos[0];
+    no->chaves[0] = pai->chaves[posicaoNo - 1];
+    no->filhos[0] = irmaoEsquerdo->filhos[irmaoEsquerdo->total];
+
+    contador++;
+    if (no->filhos[0] != NULL) {
+      no->filhos[0]->pai = no;
+    }
+
+    pai->chaves[posicaoNo - 1] = irmaoEsquerdo->chaves[irmaoEsquerdo->total - 1];
+    irmaoEsquerdo->total--;
+    no->total++;
+  } else if (irmaoDireito != NULL && irmaoDireito->total > arvore->ordem) {
+    contador++;
+    no->chaves[no->total] = pai->chaves[posicaoNo];
+    no->filhos[no->total + 1] = irmaoDireito->filhos[0];
+
+    contador++;
+    if (no->filhos[no->total + 1] != NULL) {
+      no->filhos[no->total + 1]->pai = no;
+    }
+
+    pai->chaves[posicaoNo] = irmaoDireito->chaves[0];
+
+    for (int i = 0; i < irmaoDireito->total - 1; i++) {
+      irmaoDireito->chaves[i] = irmaoDireito->chaves[i + 1];
+      irmaoDireito->filhos[i] = irmaoDireito->filhos[i + 1];
+      contador++;
+    }
+    contador++;
+
+    irmaoDireito->filhos[irmaoDireito->total - 1] = irmaoDireito->filhos[irmaoDireito->total];
+    irmaoDireito->total--;
+    no->total++;
+  } else {
+    // Fusão
+    contador++;
+    if (irmaoEsquerdo != NULL) {
+      irmaoEsquerdo->chaves[irmaoEsquerdo->total] = pai->chaves[posicaoNo - 1];
+      irmaoEsquerdo->total++;
+      contador++;
+
+      for (int i = 0; i < no->total; i++) {
+        contador++;
+        irmaoEsquerdo->chaves[irmaoEsquerdo->total] = no->chaves[i];
+        irmaoEsquerdo->filhos[irmaoEsquerdo->total] = no->filhos[i];
+        if (irmaoEsquerdo->filhos[irmaoEsquerdo->total] != NULL) {
+          irmaoEsquerdo->filhos[irmaoEsquerdo->total]->pai = irmaoEsquerdo;
+        }
+        contador++;
+        irmaoEsquerdo->total++;
+      }
+      contador++;
+
+      irmaoEsquerdo->filhos[irmaoEsquerdo->total] = no->filhos[no->total];
+      if (irmaoEsquerdo->filhos[irmaoEsquerdo->total] != NULL) {
+        irmaoEsquerdo->filhos[irmaoEsquerdo->total]->pai = irmaoEsquerdo;
+      }
+      contador++;
+
+      for (int i = posicaoNo - 1; i < pai->total - 1; i++) {
+        pai->chaves[i] = pai->chaves[i + 1];
+        pai->filhos[i + 1] = pai->filhos[i + 2];
+        contador++;
+      }
+      contador++;
+
+      pai->total--;
+
+      contador++;
+      if (pai->total < arvore->ordem && pai->pai != NULL) {
+        balancearNo(arvore, pai);
+      }
+    } else if (irmaoDireito != NULL) {
+      contador++; // Incrementando contador para a comparação
+      no->chaves[no->total] = pai->chaves[posicaoNo];
+      no->total++;
+      contador++; // Incrementando contador
+
+      for (int i = 0; i < irmaoDireito->total; i++) {
+        contador++;
+        no->chaves[no->total] = irmaoDireito->chaves[i];
+        no->filhos[no->total] = irmaoDireito->filhos[i];
+        if (no->filhos[no->total] != NULL) {
+          no->filhos[no->total]->pai = no;
+        }
+        no->total++;
+        contador++;
+      }
+      contador++;
+
+      no->filhos[no->total] = irmaoDireito->filhos[irmaoDireito->total];
+      if (no->filhos[no->total] != NULL) {
+        no->filhos[no->total]->pai = no;
+      }
+      contador++;
+
+      for (int i = posicaoNo; i < pai->total - 1; i++) {
+        pai->chaves[i] = pai->chaves[i + 1];
+        pai->filhos[i + 1] = pai->filhos[i + 2];
+        contador++; // Incrementando contador a cada iteração
+      }
+      contador++; // Incrementando contador para a comparação final do for
+
+      pai->total--;
+
+      if (pai->total < arvore->ordem && pai->pai != NULL) {
+        balancearNo(arvore, pai);
+      }
+      contador++;
+    }
+    contador++;
+  }
+
+  if (pai->total == 0) {
+    arvore->raiz = no;
+    no->pai = NULL;
+    free(pai->chaves);
+    free(pai->filhos);
+    free(pai);
+  }
+  contador++;
+}
+
 
 int main() {
   for (int j = 0; j < 30; j++) {

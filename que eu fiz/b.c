@@ -18,7 +18,6 @@ ArvoreB* criaArvore(int);
 No* criaNo(ArvoreB*);
 void percorreArvore(No*);
 int pesquisaBinaria(No*, int);
-int localizaChave(ArvoreB*, int);
 No* localizaNo(ArvoreB*, int);
 void adicionaChaveNo(No*, No*, int);
 int transbordo(ArvoreB*, No*);
@@ -49,7 +48,11 @@ No* criaNo(ArvoreB* arvore) {
   no->filhos = malloc(sizeof(No) * (max + 2));
   no->total = 0;
 
-  for (int i = 0; i < max + 2; i++) no->filhos[i] = NULL;
+  contador++;
+  for (int i = 0; i < max + 2; i++) {
+    contador++;
+    no->filhos[i] = NULL;
+  }
 
   return no;
 }
@@ -69,46 +72,36 @@ void percorreArvore(No* no) {
 int pesquisaBinaria(No* no, int chave) {
   int inicio = 0, fim = no->total - 1, meio;
 
+  contador++;
   while (inicio <= fim) {
     contador++;
 
     meio = (inicio + fim) / 2;
 
     if (no->chaves[meio] == chave) {
+      contador++;
       return meio;  // encontrou
     } else if (no->chaves[meio] > chave) {
+      contador += 2;
       fim = meio - 1;
     } else {
+      contador += 2;
       inicio = meio + 1;
     }
   }
   return inicio;  // não encontrou
 }
 
-int localizaChave(ArvoreB* arvore, int chave) {
-  No* no = arvore->raiz;
-
-  while (no != NULL) {
-    int i = pesquisaBinaria(no, chave);
-
-    if (i < no->total && no->chaves[i] == chave) {
-      return 1;  // encontrou
-    } else {
-      no = no->filhos[i];
-    }
-  }
-
-  return 0;  // não encontrou
-}
-
 No* localizaNo(ArvoreB* arvore, int chave) {
   No* no = arvore->raiz;
 
+  contador++;
   while (no != NULL) {
     contador++;
 
     int i = pesquisaBinaria(no, chave);
 
+    contador++;
     if (no->filhos[i] == NULL)
       return no;  // encontrou nó
     else
@@ -164,10 +157,9 @@ No* divideNo(ArvoreB* arvore, No* no) {
 }
 
 void adicionaChaveRecursivo(ArvoreB* arvore, No* no, No* novo, int chave) {
-  contador++;
-
   adicionaChaveNo(no, novo, chave);
 
+  contador++;
   if (transbordo(arvore, no)) {
     int promovido = no->chaves[arvore->ordem];
     No* novo = divideNo(arvore, no);
@@ -258,7 +250,8 @@ void balancearNo(ArvoreB* arvore, No* no) {
       no->filhos[0]->pai = no;
     }
 
-    pai->chaves[posicaoNo - 1] = irmaoEsquerdo->chaves[irmaoEsquerdo->total - 1];
+    pai->chaves[posicaoNo - 1] =
+        irmaoEsquerdo->chaves[irmaoEsquerdo->total - 1];
     irmaoEsquerdo->total--;
     no->total++;
   } else if (irmaoDireito != NULL && irmaoDireito->total > arvore->ordem) {
@@ -280,7 +273,8 @@ void balancearNo(ArvoreB* arvore, No* no) {
     }
     contador++;
 
-    irmaoDireito->filhos[irmaoDireito->total - 1] = irmaoDireito->filhos[irmaoDireito->total];
+    irmaoDireito->filhos[irmaoDireito->total - 1] =
+        irmaoDireito->filhos[irmaoDireito->total];
     irmaoDireito->total--;
     no->total++;
   } else {
@@ -323,10 +317,10 @@ void balancearNo(ArvoreB* arvore, No* no) {
         balancearNo(arvore, pai);
       }
     } else if (irmaoDireito != NULL) {
-      contador++; // Incrementando contador para a comparação
+      contador++;  // Incrementando contador para a comparação
       no->chaves[no->total] = pai->chaves[posicaoNo];
       no->total++;
-      contador++; // Incrementando contador
+      contador++;  // Incrementando contador
 
       for (int i = 0; i < irmaoDireito->total; i++) {
         contador++;
@@ -349,9 +343,9 @@ void balancearNo(ArvoreB* arvore, No* no) {
       for (int i = posicaoNo; i < pai->total - 1; i++) {
         pai->chaves[i] = pai->chaves[i + 1];
         pai->filhos[i + 1] = pai->filhos[i + 2];
-        contador++; // Incrementando contador a cada iteração
+        contador++;  // Incrementando contador a cada iteração
       }
-      contador++; // Incrementando contador para a comparação final do for
+      contador++;  // Incrementando contador para a comparação final do for
 
       pai->total--;
 
@@ -373,30 +367,29 @@ void balancearNo(ArvoreB* arvore, No* no) {
   contador++;
 }
 
-
 int main() {
-  for (int j = 0; j < 30; j++) {
-    ArvoreB* arvore = criaArvore(5);
+  for (int j = 0; j < 1; j++) {
+    ArvoreB* arvore = criaArvore(1);
     sleep(1);
     srand(time(0));
 
+    int tamAmostra = 10000;
+    int valores[tamAmostra];
     contador = 0;
 
-    for (int i = 0; i < 10000; i++) {
-      int operacao = rand() % 2;  // 0 ou 1
+    for (int i = 0; i < tamAmostra; i++) {
+      int operacao = 0;
       int valor = rand() % 100000;
+      valores[i] = valor;
 
-      switch (operacao) {
-        case 0:
-          adicionaChave(arvore, valor);
-          break;
-        case 1:
-          removerChave(arvore, valor);
-          break;
-      }
+      adicionaChave(arvore, valor);
     }
 
-    percorreArvore(arvore->raiz);
-    printf("\nNumero de operacoes: %d\n", contador);
+    // for (int i = 0; i < tamAmostra; i++) {
+    //   removerChave(arvore, valores[i]);
+    // }
+
+    // percorreArvore(arvore->raiz);
+    printf("\nNumero de operacoes Arvore B: %d\n", contador);
   }
 }

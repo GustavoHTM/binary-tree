@@ -20,13 +20,18 @@ typedef struct arvore {
 
 No* criarNo(Arvore*, No*, int);
 void balancear(Arvore*, No*);
+void balancearRemocao(Arvore*, No*);
 void rotacionarEsquerda(Arvore*, No*);
 void rotacionarDireita(Arvore*, No*);
-
 Arvore* criar();
 int vazia(Arvore*);
 No* adicionar(Arvore*, int);
 No* localizar(Arvore* arvore, int valor);
+No* substituir(Arvore*, No*);
+No* minimo(Arvore*, No*);
+void remover(Arvore*, int);
+void removerNo(Arvore*, No*);
+void transplante(Arvore*, No*, No*);
 
 int contador = 0;
 
@@ -200,6 +205,61 @@ void balancear(Arvore* arvore, No* no) {
   arvore->raiz->cor = Preto;  // Conserta possível quebra regra 2
 }
 
+void balancearRemocao(Arvore* arvore, No* no) {
+  while (no != arvore->raiz && no->cor == Preto) {
+    if (no == no->pai->esquerda) {
+      No* irmao = no->pai->direita;
+      if (irmao->cor == Vermelho) {
+        irmao->cor = Preto;
+        no->pai->cor = Vermelho;
+        rotacionarEsquerda(arvore, no->pai);
+        irmao = no->pai->direita;
+      }
+      if (irmao->esquerda->cor == Preto && irmao->direita->cor == Preto) {
+        irmao->cor = Vermelho;
+        no = no->pai;
+      } else {
+        if (irmao->direita->cor == Preto) {
+          irmao->esquerda->cor = Preto;
+          irmao->cor = Vermelho;
+          rotacionarDireita(arvore, irmao);
+          irmao = no->pai->direita;
+        }
+        irmao->cor = no->pai->cor;
+        no->pai->cor = Preto;
+        irmao->direita->cor = Preto;
+        rotacionarEsquerda(arvore, no->pai);
+        no = arvore->raiz;
+      }
+    } else {
+      No* irmao = no->pai->esquerda;
+      if (irmao->cor == Vermelho) {
+        irmao->cor = Preto;
+        no->pai->cor = Vermelho;
+        rotacionarDireita(arvore, no->pai);
+        irmao = no->pai->esquerda;
+      }
+      if (irmao->direita->cor == Preto && irmao->esquerda->cor == Preto) {
+        irmao->cor = Vermelho;
+        no = no->pai;
+      } else {
+        if (irmao->esquerda->cor == Preto) {
+          irmao->direita->cor = Preto;
+          irmao->cor = Vermelho;
+          rotacionarEsquerda(arvore, irmao);
+          irmao = no->pai->esquerda;
+        }
+        irmao->cor = no->pai->cor;
+        no->pai->cor = Preto;
+        irmao->esquerda->cor = Preto;
+        rotacionarDireita(arvore, no->pai);
+        no = arvore->raiz;
+      }
+    }
+  }
+  no->cor = Preto;
+}
+
 void rotacionarEsquerda(Arvore* arvore, No* no) {
   No* direita = no->direita;
   no->direita = direita->esquerda;
@@ -252,26 +312,114 @@ void rotacionarDireita(Arvore* arvore, No* no) {
   no->pai = esquerda;
 }
 
+No* minimo(Arvore* arvore, No* no) {
+  contador++;
+  while (no->esquerda != arvore->nulo) {
+    contador++;
+    no = no->esquerda;
+  }
+  return no;
+}
+
+No* substituir(Arvore* arvore, No* no) {
+  contador++;
+  if (no->esquerda != arvore->nulo && no->direita != arvore->nulo) {
+    return minimo(arvore, no->direita);
+  }
+  contador++;
+  if (no->esquerda == arvore->nulo && no->direita == arvore->nulo) {
+    return arvore->nulo;
+  }
+  contador++;
+  if (no->esquerda != arvore->nulo) {
+    return no->esquerda;
+  }
+  return no->direita;
+}
+
+void transplante(Arvore* arvore, No* u, No* v) {
+  if (u->pai == arvore->nulo) {
+    contador++;
+    arvore->raiz = v;
+  } else if (u == u->pai->esquerda) {
+    contador += 2;
+    u->pai->esquerda = v;
+  } else {
+    contador += 2;
+    u->pai->direita = v;
+  }
+  v->pai = u->pai;
+}
+
+void remover(Arvore* arvore, int valor) {
+  No* no = localizar(arvore, valor);
+  contador++;
+  if (no == arvore->nulo) {
+    return;
+  }
+  removerNo(arvore, no);
+}
+
+void removerNo(Arvore* arvore, No* no) {
+  No* y = no;
+  No* x;
+  Cor corOriginal = y->cor;
+  if (no->esquerda == arvore->nulo) {
+    contador++;
+    x = no->direita;
+    transplante(arvore, no, no->direita);
+  } else if (no->direita == arvore->nulo) {
+    contador += 2;
+    x = no->esquerda;
+    transplante(arvore, no, no->esquerda);
+  } else {
+    contador += 2;
+    y = minimo(arvore, no->direita);
+    corOriginal = y->cor;
+    x = y->direita;
+    contador++;
+    if (y->pai == no) {
+      x->pai = y;
+    } else {
+      transplante(arvore, y, y->direita);
+      y->direita = no->direita;
+      y->direita->pai = y;
+    }
+    transplante(arvore, no, y);
+    y->esquerda = no->esquerda;
+    y->esquerda->pai = y;
+    y->cor = no->cor;
+  }
+  free(no);
+  contador++;
+  if (corOriginal == Preto) {
+    balancearRemocao(arvore, x);
+  }
+}
+
 int main() {
-  for (int j = 0; j < 30; j++) {
+  for (int j = 0; j < 1; j++) {
     Arvore* a = criar();
     sleep(1);
     srand(time(0));
 
+    int tamAmostra = 10000;
+    int valores[tamAmostra];
     contador = 0;
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < tamAmostra; i++) {
       int operacao = 0;
       int valor = rand() % 100000;
+      valores[i] = valor;
 
-      switch (operacao) {
-        case 0:
-          adicionar(a, valor);
-          break;
-      }
+      adicionar(a, valor);
     }
 
-    printf("\nNumero de operacoes: %d\n", contador);
+    // for (int i = 0; i < tamAmostra; i++) {
+    //   remover(a, valores[i]);
+    // }
+
+    printf("\nNumero de operacoes Arvore Rubro-negra: %d\n", contador);
   }
 
   return 0;

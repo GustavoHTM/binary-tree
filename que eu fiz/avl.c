@@ -128,6 +128,7 @@ void balanceamento(Arvore* arvore, No* no) {
     contador++;
 
     no->altura = max(altura(no->esquerda), altura(no->direita)) + 1;
+    contador++;
     int fator = fb(no);
 
     if (fator > 1) {  // árvore mais pesada para esquerda
@@ -189,8 +190,8 @@ No* rse(Arvore* arvore, No* no) {
   No* pai = no->pai;
   No* direita = no->direita;
 
+  contador++;
   if (direita->esquerda != NULL) {
-    contador++;
     direita->esquerda->pai = no;
   }
 
@@ -200,23 +201,23 @@ No* rse(Arvore* arvore, No* no) {
   direita->esquerda = no;
   direita->pai = pai;
 
+  contador++;
   if (pai == NULL) {
-    contador++;
     arvore->raiz = direita;
   } else {
-    contador++;
     if (pai->esquerda == no) {
-      contador++;
       pai->esquerda = direita;
     } else {
-      contador++;
       pai->direita = direita;
     }
+    contador++;
   }
 
   no->altura = max(altura(no->esquerda), altura(no->direita)) + 1;
   direita->altura =
       max(altura(direita->esquerda), altura(direita->direita)) + 1;
+
+  contador++;
 
   return direita;
 }
@@ -226,9 +227,9 @@ No* rsd(Arvore* arvore, No* no) {
   No* esquerda = no->esquerda;
 
   if (esquerda->direita != NULL) {
-    contador++;
     esquerda->direita->pai = no;
   }
+  contador++;
 
   no->esquerda = esquerda->direita;
   no->pai = esquerda;
@@ -236,22 +237,23 @@ No* rsd(Arvore* arvore, No* no) {
   esquerda->direita = no;
   esquerda->pai = pai;
 
+  contador++;
   if (pai == NULL) {
-    contador++;
     arvore->raiz = esquerda;
   } else {
     if (pai->esquerda == no) {
-      contador++;
       pai->esquerda = esquerda;
     } else {
-      contador++;
       pai->direita = esquerda;
     }
+    contador++;
   }
 
   no->altura = max(altura(no->esquerda), altura(no->direita)) + 1;
   esquerda->altura =
       max(altura(esquerda->esquerda), altura(esquerda->direita)) + 1;
+
+  contador++;
 
   return esquerda;
 }
@@ -318,7 +320,7 @@ void remover(Arvore* arvore, int valor) {
 }
 
 int main() {
-  for (int j = 0; j < 30; j++) {
+  for (int j = 0; j < 1; j++) {
     Arvore* a = criar();
     sleep(1);
     srand(time(0));
@@ -332,7 +334,7 @@ int main() {
       adicionar(a, valor);
     }
 
-    printf("\nNumero de iteracoes atual: %d\n", contador);
+    printf("\nNumero de iteracoes atual Arvore AVL: %d\n", contador);
   }
 
   return 0;

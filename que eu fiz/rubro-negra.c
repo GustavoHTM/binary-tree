@@ -86,6 +86,7 @@ No* adicionarNo(Arvore* arvore, No* no, int valor) {
 }
 
 No* adicionar(Arvore* arvore, int valor) {
+  contador++;
   if (vazia(arvore)) {
     arvore->raiz = criarNo(arvore, arvore->nulo, valor);
     arvore->raiz->cor = Preto;
@@ -100,6 +101,7 @@ No* adicionar(Arvore* arvore, int valor) {
 }
 
 No* localizar(Arvore* arvore, int valor) {
+  contador++;
   if (!vazia(arvore)) {
     No* no = arvore->raiz;
 
@@ -121,6 +123,7 @@ No* localizar(Arvore* arvore, int valor) {
 
 void percorrerProfundidadeInOrder(Arvore* arvore, No* no,
                                   void (*callback)(int)) {
+  contador++;
   if (no != arvore->nulo) {
     percorrerProfundidadeInOrder(arvore, no->esquerda, callback);
     callback(no->valor);
@@ -130,6 +133,7 @@ void percorrerProfundidadeInOrder(Arvore* arvore, No* no,
 
 void percorrerProfundidadePreOrder(Arvore* arvore, No* no,
                                    void (*callback)(int)) {
+  contador++;
   if (no != arvore->nulo) {
     callback(no->valor);
     percorrerProfundidadePreOrder(arvore, no->esquerda, callback);
@@ -139,6 +143,7 @@ void percorrerProfundidadePreOrder(Arvore* arvore, No* no,
 
 void percorrerProfundidadePosOrder(Arvore* arvore, No* no,
                                    void(callback)(int)) {
+  contador++;
   if (no != arvore->nulo) {
     percorrerProfundidadePosOrder(arvore, no->esquerda, callback);
     percorrerProfundidadePosOrder(arvore, no->direita, callback);

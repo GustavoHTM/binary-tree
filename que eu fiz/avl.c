@@ -70,6 +70,7 @@ void adicionar(Arvore* arvore, int valor) {
       }
     }
   }
+  contador++;
 
   No* novo = malloc(sizeof(No));
   novo->valor = valor;
@@ -101,11 +102,14 @@ No* localizar(No* no, int valor) {
     if (no->valor == valor) {
       contador++;
       return no;
+    } else {
+      contador++;
     }
 
     no = valor < no->valor ? no->esquerda : no->direita;
     contador++;
   }
+  contador++;
 
   return NULL;
 }
@@ -116,6 +120,8 @@ void percorrer(No* no, void (*callback)(int)) {
     percorrer(no->esquerda, callback);
     callback(no->valor);
     percorrer(no->direita, callback);
+  } else {
+    contador++;
   }
 }
 
@@ -158,10 +164,13 @@ void balanceamento(Arvore* arvore, No* no) {
         rde(arvore, no);  // rotação dupla a esquerda, pois o FB do filho tem
                           // sinal diferente
       }
+    } else {
+      contador++;
     }
 
     no = no->pai;
   }
+  contador++;
 }
 
 int altura(No* no) {
@@ -175,11 +184,15 @@ int fb(No* no) {
   if (no->esquerda != NULL) {
     contador++;
     esquerda = no->esquerda->altura;
+  } else {
+    contador++;
   }
 
   if (no->direita != NULL) {
     contador++;
     direita = no->direita->altura;
+  } else {
+    contador++;
   }
 
   return esquerda - direita;
@@ -192,6 +205,8 @@ No* rse(Arvore* arvore, No* no) {
   if (direita->esquerda != NULL) {
     contador++;
     direita->esquerda->pai = no;
+  } else {
+    contador++;
   }
 
   no->direita = direita->esquerda;
@@ -228,6 +243,8 @@ No* rsd(Arvore* arvore, No* no) {
   if (esquerda->direita != NULL) {
     contador++;
     esquerda->direita->pai = no;
+  } else {
+    contador++;
   }
 
   no->esquerda = esquerda->direita;
@@ -240,6 +257,7 @@ No* rsd(Arvore* arvore, No* no) {
     contador++;
     arvore->raiz = esquerda;
   } else {
+    contador++;
     if (pai->esquerda == no) {
       contador++;
       pai->esquerda = esquerda;
@@ -271,12 +289,15 @@ No* minValorNo(No* no) {
   while (atual->esquerda != NULL) {
     contador++;
     atual = atual->esquerda;
-  };
+  }
+  contador++;
   return atual;
 }
 
 void remover(Arvore* arvore, int valor) {
   No* no = localizar(arvore->raiz, valor);
+
+  contador++;
   if (no == NULL) return;
 
   No* pai = no->pai;
@@ -289,7 +310,9 @@ void remover(Arvore* arvore, int valor) {
     if (substituto != NULL) {
       contador++;
       substituto->pai = pai;
-    };
+    } else {
+      contador++;
+    }
 
     if (pai == NULL) {
       arvore->raiz = substituto;

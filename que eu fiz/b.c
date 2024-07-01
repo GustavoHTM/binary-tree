@@ -50,19 +50,22 @@ No* criaNo(ArvoreB* arvore) {
 
   contador++;
   for (int i = 0; i < max + 2; i++) {
-    contador++;
     no->filhos[i] = NULL;
+    contador++;
   }
 
   return no;
 }
 
 void percorreArvore(No* no) {
+  contador++;
   if (no != NULL) {
+    contador++;
     for (int i = 0; i < no->total; i++) {
       percorreArvore(no->filhos[i]);  // visita o filho a esquerda
 
       printf("%d ", no->chaves[i]);
+      contador++;
     }
 
     percorreArvore(no->filhos[no->total]);  // visita ultimo filho (direita)
@@ -74,22 +77,40 @@ int pesquisaBinaria(No* no, int chave) {
 
   contador++;
   while (inicio <= fim) {
-    contador++;
-
     meio = (inicio + fim) / 2;
 
+    contador++;
     if (no->chaves[meio] == chave) {
       contador++;
       return meio;  // encontrou
     } else if (no->chaves[meio] > chave) {
-      contador += 2;
       fim = meio - 1;
     } else {
-      contador += 2;
+      contador++;
       inicio = meio + 1;
     }
+    contador++;
   }
   return inicio;  // não encontrou
+}
+
+int localizaChave(ArvoreB* arvore, int chave) {
+  No* no = arvore->raiz;
+
+  contador++;
+  while (no != NULL) {
+    int i = pesquisaBinaria(no, chave);
+
+    contador++;
+    if (i < no->total && no->chaves[i] == chave) {
+      return 1;  // encontrou
+    } else {
+      no = no->filhos[i];
+    }
+    contador++;
+  }
+
+  return 0;  // não encontrou
 }
 
 No* localizaNo(ArvoreB* arvore, int chave) {
@@ -97,8 +118,6 @@ No* localizaNo(ArvoreB* arvore, int chave) {
 
   contador++;
   while (no != NULL) {
-    contador++;
-
     int i = pesquisaBinaria(no, chave);
 
     contador++;
@@ -106,6 +125,7 @@ No* localizaNo(ArvoreB* arvore, int chave) {
       return no;  // encontrou nó
     else
       no = no->filhos[i];
+    contador++;
   }
 
   return NULL;  // não encontrou nenhum nó
@@ -144,13 +164,17 @@ No* divideNo(ArvoreB* arvore, No* no) {
   for (int i = meio + 1; i < no->total; i++) {
     novo->filhos[novo->total] = no->filhos[i];
     novo->chaves[novo->total] = no->chaves[i];
+
+    contador++;
     if (novo->filhos[novo->total] != NULL)
       novo->filhos[novo->total]->pai = novo;
 
     novo->total++;
+    contador++;
   }
 
   novo->filhos[novo->total] = no->filhos[no->total];
+  contador++;
   if (novo->filhos[novo->total] != NULL) novo->filhos[novo->total]->pai = novo;
   no->total = meio;
   return novo;
@@ -164,6 +188,7 @@ void adicionaChaveRecursivo(ArvoreB* arvore, No* no, No* novo, int chave) {
     int promovido = no->chaves[arvore->ordem];
     No* novo = divideNo(arvore, no);
 
+    contador++;
     if (no->pai == NULL) {
       No* pai = criaNo(arvore);
       pai->filhos[0] = no;
@@ -175,7 +200,6 @@ void adicionaChaveRecursivo(ArvoreB* arvore, No* no, No* novo, int chave) {
     } else {
       adicionaChaveRecursivo(arvore, no->pai, novo, promovido);
     }
-    contador++;
   }
 }
 
@@ -233,6 +257,8 @@ void balancearNo(ArvoreB* arvore, No* no) {
   contador++;
 
   // Tenta a redistribuição
+  contador++;
+  contador++;
   if (irmaoEsquerdo != NULL && irmaoEsquerdo->total > arvore->ordem) {
     contador++;
     for (int i = no->total; i > 0; i--) {
@@ -240,7 +266,6 @@ void balancearNo(ArvoreB* arvore, No* no) {
       no->filhos[i + 1] = no->filhos[i];
       contador++;
     }
-    contador++;
     no->filhos[1] = no->filhos[0];
     no->chaves[0] = pai->chaves[posicaoNo - 1];
     no->filhos[0] = irmaoEsquerdo->filhos[irmaoEsquerdo->total];
@@ -255,7 +280,6 @@ void balancearNo(ArvoreB* arvore, No* no) {
     irmaoEsquerdo->total--;
     no->total++;
   } else if (irmaoDireito != NULL && irmaoDireito->total > arvore->ordem) {
-    contador++;
     no->chaves[no->total] = pai->chaves[posicaoNo];
     no->filhos[no->total + 1] = irmaoDireito->filhos[0];
 
@@ -280,10 +304,10 @@ void balancearNo(ArvoreB* arvore, No* no) {
   } else {
     // Fusão
     contador++;
+    contador++;
     if (irmaoEsquerdo != NULL) {
       irmaoEsquerdo->chaves[irmaoEsquerdo->total] = pai->chaves[posicaoNo - 1];
       irmaoEsquerdo->total++;
-      contador++;
 
       for (int i = 0; i < no->total; i++) {
         contador++;
@@ -317,7 +341,6 @@ void balancearNo(ArvoreB* arvore, No* no) {
         balancearNo(arvore, pai);
       }
     } else if (irmaoDireito != NULL) {
-      contador++;  // Incrementando contador para a comparação
       no->chaves[no->total] = pai->chaves[posicaoNo];
       no->total++;
       contador++;  // Incrementando contador
@@ -354,7 +377,6 @@ void balancearNo(ArvoreB* arvore, No* no) {
       }
       contador++;
     }
-    contador++;
   }
 
   if (pai->total == 0) {

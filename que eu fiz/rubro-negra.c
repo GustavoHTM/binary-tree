@@ -422,14 +422,15 @@ int main() {
       adicionar(a, valor);
     }
 
+    int insertCounter = contador;
     for (int i = 0; i < tamAmostra; i++) {
       remover(a, valores[i]);
     }
 
     if (j == loops - 1) {
-      printf("%d", contador);
+      printf("[%d, %d]", insertCounter, contador - insertCounter);
     } else {
-      printf("%d, ", contador);
+      printf("[%d, %d],", insertCounter, contador - insertCounter);
     }
   }
   printf("]\n");

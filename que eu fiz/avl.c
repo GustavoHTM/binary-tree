@@ -126,7 +126,7 @@ void percorrer(No* no, void (*callback)(int)) {
 }
 
 void visitar(int valor) {
-  //   printf("%d ", valor);
+    printf("%d ", valor);
 }
 
 void balanceamento(Arvore* arvore, No* no) {
@@ -297,49 +297,44 @@ No* minValorNo(No* no) {
 }
 
 void remover(Arvore* arvore, int valor) {
-  No* no = localizar(arvore->raiz, valor);
+    No* no = localizar(arvore->raiz, valor);
 
-  contador++;
-  if (no == NULL) return;
-
-  No* pai = no->pai;
-  No* substituto;
-
-  if (no->esquerda == NULL || no->direita == NULL) {
     contador++;
-    substituto = no->esquerda ? no->esquerda : no->direita;
+    if (no == NULL) return;
 
-    if (substituto != NULL) {
-      contador++;
-      substituto->pai = pai;
-    } else {
-      contador++;
+    // printf("Removendo o valor %d\n", valor);
+
+    while (no != NULL) {
+        No* substituto = NULL;
+        No* pai = no->pai;
+
+        if (no->esquerda == NULL || no->direita == NULL) {
+            substituto = no->esquerda ? no->esquerda : no->direita;
+
+            if (substituto != NULL) {
+                substituto->pai = pai;
+            }
+
+            if (pai == NULL) {
+                arvore->raiz = substituto;
+            } else {
+                if (no == pai->esquerda) {
+                    pai->esquerda = substituto;
+                } else {
+                    pai->direita = substituto;
+                }
+            }
+
+            free(no);
+            no = NULL;  // End the loop
+        } else {
+            No* sucessor = minValorNo(no->direita);
+            no->valor = sucessor->valor;
+            no = sucessor;  // Continue to remove the successor
+        }
+
+        balanceamento(arvore, pai);
     }
-
-    if (pai == NULL) {
-      arvore->raiz = substituto;
-      contador++;
-    } else {
-      contador++;
-      if (no == pai->esquerda) {
-        contador++;
-        pai->esquerda = substituto;
-      } else {
-        contador++;
-        pai->direita = substituto;
-      }
-    }
-  } else {
-    contador++;
-    No* sucessor = minValorNo(no->direita);
-    no->valor = sucessor->valor;
-    remover(arvore, sucessor->valor);
-    return;
-  }
-
-  free(no);
-
-  balanceamento(arvore, pai);
 }
 
 int main() {
@@ -362,15 +357,17 @@ int main() {
       adicionar(a, valor);
     }
 
-    // for (int i = 0; i < tamAmostra; i++) {
-    //   remover(a, valores[i]);
-    // } essa bosta de remover ta cagando
+    int insertCounter = contador;
+    for (int i = 0; i < tamAmostra; i++) {
+      remover(a, valores[i]);
+    } // essa bosta de remover ta cagando
 
     if (j == loops - 1) {
-      printf("%d", contador);
+      printf("[%d, %d],", insertCounter, contador - insertCounter);
     } else {
-      printf("%d, ", contador);
+      printf("[%d, %d],", insertCounter, contador - insertCounter);
     }
+    percorrer(a->raiz,visitar);
   }
   printf("]\n");
 

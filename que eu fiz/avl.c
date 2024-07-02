@@ -343,22 +343,36 @@ void remover(Arvore* arvore, int valor) {
 }
 
 int main() {
-  for (int j = 0; j < 1; j++) {
+  int loops = 30;
+  printf("\n[");
+  for (int j = 0; j < loops; j++) {
     Arvore* a = criar();
     sleep(1);
     srand(time(0));
 
+    int tamAmostra = 10000;
+    int valores[tamAmostra];
     contador = 0;
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < tamAmostra; i++) {
       int operacao = 0;
       int valor = rand() % 10000;
+      valores[i] = valor;
 
       adicionar(a, valor);
     }
 
-    printf("\nNumero de iteracoes atual Arvore AVL: %d\n", contador);
+    // for (int i = 0; i < tamAmostra; i++) {
+    //   remover(a, valores[i]);
+    // } essa bosta de remover ta cagando
+
+    if (j == loops - 1) {
+      printf("%d", contador);
+    } else {
+      printf("%d, ", contador);
+    }
   }
+  printf("]\n");
 
   return 0;
 }

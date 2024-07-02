@@ -403,7 +403,9 @@ void removerNo(Arvore* arvore, No* no) {
 }
 
 int main() {
-  for (int j = 0; j < 1; j++) {
+  int loops = 30;
+  printf("\n[");
+  for (int j = 0; j < loops; j++) {
     Arvore* a = criar();
     sleep(1);
     srand(time(0));
@@ -420,12 +422,17 @@ int main() {
       adicionar(a, valor);
     }
 
-    // for (int i = 0; i < tamAmostra; i++) {
-    //   remover(a, valores[i]);
-    // }
+    for (int i = 0; i < tamAmostra; i++) {
+      remover(a, valores[i]);
+    }
 
-    printf("\nNumero de operacoes Arvore Rubro-negra: %d\n", contador);
+    if (j == loops - 1) {
+      printf("%d", contador);
+    } else {
+      printf("%d, ", contador);
+    }
   }
+  printf("]\n");
 
   return 0;
 }

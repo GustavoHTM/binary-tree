@@ -390,7 +390,9 @@ void balancearNo(ArvoreB* arvore, No* no) {
 }
 
 int main() {
-  for (int j = 0; j < 1; j++) {
+  int loops = 30;
+  printf("\n[");
+  for (int j = 0; j < loops; j++) {
     ArvoreB* arvore = criaArvore(1);
     sleep(1);
     srand(time(0));
@@ -409,9 +411,15 @@ int main() {
 
     // for (int i = 0; i < tamAmostra; i++) {
     //   removerChave(arvore, valores[i]);
-    // }
+    // }  esse lixo não funciona em arvores de outras ordens alem de 1
+
+    if (j == loops - 1) {
+      printf("%d", contador);
+    } else {
+      printf("%d, ", contador);
+    }
 
     // percorreArvore(arvore->raiz);
-    printf("\nNumero de operacoes Arvore B: %d\n", contador);
   }
+  printf("]\n");
 }

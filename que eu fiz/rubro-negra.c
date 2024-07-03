@@ -48,7 +48,7 @@ Arvore* criar() {
 
 int vazia(Arvore* arvore) {
   contador++;
-  return arvore->raiz == NULL;
+  return arvore->raiz == NULL || arvore->raiz == arvore->nulo;
 }
 
 No* criarNo(Arvore* arvore, No* pai, int valor) {
@@ -63,16 +63,14 @@ No* criarNo(Arvore* arvore, No* pai, int valor) {
 }
 
 No* adicionarNo(Arvore* arvore, No* no, int valor) {
+  contador++;
   if (valor > no->valor) {
     contador++;
     if (no->direita == arvore->nulo) {
       no->direita = criarNo(arvore, no, valor);
       no->direita->cor = Vermelho;
-
-      contador++;
       return no->direita;
     } else {
-      contador++;
       return adicionarNo(arvore, no->direita, valor);
     }
   } else {
@@ -80,11 +78,8 @@ No* adicionarNo(Arvore* arvore, No* no, int valor) {
     if (no->esquerda == arvore->nulo) {
       no->esquerda = criarNo(arvore, no, valor);
       no->esquerda->cor = Vermelho;
-
-      contador++;
       return no->esquerda;
     } else {
-      contador++;
       return adicionarNo(arvore, no->esquerda, valor);
     }
   }
@@ -114,12 +109,12 @@ No* localizar(Arvore* arvore, int valor) {
     while (no != arvore->nulo) {
       contador++;
       if (no->valor == valor) {
-        contador++;
         return no;
       } else {
         contador++;
         no = valor < no->valor ? no->esquerda : no->direita;
       }
+      contador++;
     }
   }
 
@@ -211,19 +206,24 @@ void balancear(Arvore* arvore, No* no) {
 }
 
 void balancearRemocao(Arvore* arvore, No* no) {
+  contador++;
   while (no != arvore->raiz && no->cor == Preto) {
+    contador++;
     if (no == no->pai->esquerda) {
       No* irmao = no->pai->direita;
+      contador++;
       if (irmao->cor == Vermelho) {
         irmao->cor = Preto;
         no->pai->cor = Vermelho;
         rotacionarEsquerda(arvore, no->pai);
         irmao = no->pai->direita;
       }
+      contador++;
       if (irmao->esquerda->cor == Preto && irmao->direita->cor == Preto) {
         irmao->cor = Vermelho;
         no = no->pai;
       } else {
+        contador++;
         if (irmao->direita->cor == Preto) {
           irmao->esquerda->cor = Preto;
           irmao->cor = Vermelho;
@@ -238,16 +238,19 @@ void balancearRemocao(Arvore* arvore, No* no) {
       }
     } else {
       No* irmao = no->pai->esquerda;
+      contador++;
       if (irmao->cor == Vermelho) {
         irmao->cor = Preto;
         no->pai->cor = Vermelho;
         rotacionarDireita(arvore, no->pai);
         irmao = no->pai->esquerda;
       }
+      contador++;
       if (irmao->direita->cor == Preto && irmao->esquerda->cor == Preto) {
         irmao->cor = Vermelho;
         no = no->pai;
       } else {
+        contador++;
         if (irmao->esquerda->cor == Preto) {
           irmao->direita->cor = Preto;
           irmao->cor = Vermelho;
@@ -261,6 +264,7 @@ void balancearRemocao(Arvore* arvore, No* no) {
         no = arvore->raiz;
       }
     }
+    contador++;
   }
   no->cor = Preto;
 }
@@ -403,37 +407,53 @@ void removerNo(Arvore* arvore, No* no) {
 }
 
 int main() {
+  srand(time(0));
+
   int loops = 30;
-  printf("\n[");
+  int tamAmostra = 10000;
+  int *contIns, *contRem;
+  contIns = calloc(10000, sizeof(int));
+  contRem = calloc(10000, sizeof(int));
+
   for (int j = 0; j < loops; j++) {
+    printf("loop %d\n", j+1);
     Arvore* a = criar();
     sleep(1);
     srand(time(0));
 
-    int tamAmostra = 10000;
     int valores[tamAmostra];
-    contador = 0;
 
     for (int i = 0; i < tamAmostra; i++) {
-      int operacao = 0;
+      contador = 0;
       int valor = rand() % 100000;
       valores[i] = valor;
 
       adicionar(a, valor);
-    }
+      contIns[i] += contador;
 
-    int insertCounter = contador;
-    for (int i = 0; i < tamAmostra; i++) {
-      remover(a, valores[i]);
-    }
-
-    if (j == loops - 1) {
-      printf("[%d, %d]", insertCounter, contador - insertCounter);
-    } else {
-      printf("[%d, %d],", insertCounter, contador - insertCounter);
+      contador = 0;
+      int randomInd = rand() % (i + 1);
+      int valorRandom = valores[randomInd];
+      remover(a, valorRandom);
+      contRem[i] += contador;
+      adicionar(a, valorRandom);
     }
   }
-  printf("]\n");
+
+  for (int i = 0; i < tamAmostra; i++) {
+    contIns[i] = contIns[i] / loops;
+    contRem[i] = contRem[i] / loops; 
+  }
+
+  printf("Insert\n");
+  for (int i = 0; i < tamAmostra; i++) {
+    printf("%d, ", contIns[i]);
+  }
+
+  printf("\n\nRemove\n");
+  for (int i = 0; i < tamAmostra; i++) {
+    printf("%d, ", contRem[i]);
+  }
 
   return 0;
 }

@@ -153,6 +153,7 @@ void balanceamento(Arvore* arvore, No* no) {
       }
     } else if (fator < -1) {  // árvore mais pesada para a direita
       contador++;
+      contador++;
       // rotação para a esquerda
       if (fb(no->direita) < 0) {
         contador++;
@@ -166,6 +167,7 @@ void balanceamento(Arvore* arvore, No* no) {
                           // sinal diferente
       }
     } else {
+      contador++;
       contador++;
     }
 
@@ -206,8 +208,6 @@ No* rse(Arvore* arvore, No* no) {
   contador++;
   if (direita->esquerda != NULL) {
     direita->esquerda->pai = no;
-  } else {
-    contador++;
   }
 
   no->direita = direita->esquerda;
@@ -232,8 +232,6 @@ No* rse(Arvore* arvore, No* no) {
   direita->altura =
       max(altura(direita->esquerda), altura(direita->direita)) + 1;
 
-  contador++;
-
   return direita;
 }
 
@@ -243,8 +241,6 @@ No* rsd(Arvore* arvore, No* no) {
 
   if (esquerda->direita != NULL) {
     esquerda->direita->pai = no;
-  } else {
-    contador++;
   }
   contador++;
 
@@ -264,14 +260,11 @@ No* rsd(Arvore* arvore, No* no) {
     } else {
       pai->direita = esquerda;
     }
-    contador++;
   }
 
   no->altura = max(altura(no->esquerda), altura(no->direita)) + 1;
   esquerda->altura =
       max(altura(esquerda->esquerda), altura(esquerda->direita)) + 1;
-
-  contador++;
 
   return esquerda;
 }
@@ -304,20 +297,25 @@ void remover(Arvore* arvore, int valor) {
 
     // printf("Removendo o valor %d\n", valor);
 
+    contador++;
     while (no != NULL) {
         No* substituto = NULL;
         No* pai = no->pai;
 
+        contador++;
         if (no->esquerda == NULL || no->direita == NULL) {
             substituto = no->esquerda ? no->esquerda : no->direita;
 
+            contador++;
             if (substituto != NULL) {
                 substituto->pai = pai;
             }
 
+            contador++;
             if (pai == NULL) {
                 arvore->raiz = substituto;
             } else {
+                contador++;
                 if (no == pai->esquerda) {
                     pai->esquerda = substituto;
                 } else {
@@ -334,42 +332,58 @@ void remover(Arvore* arvore, int valor) {
         }
 
         balanceamento(arvore, pai);
+        contador++;
     }
 }
 
 int main() {
+  srand(time(0));
+
   int loops = 30;
-  printf("\n[");
+  int tamAmostra = 10000;
+  int *contIns, *contRem;
+  contIns = calloc(10000, sizeof(int));
+  contRem = calloc(10000, sizeof(int));
+
   for (int j = 0; j < loops; j++) {
+    printf("loop %d\n", j+1);
     Arvore* a = criar();
     sleep(1);
     srand(time(0));
 
-    int tamAmostra = 10000;
     int valores[tamAmostra];
-    contador = 0;
 
     for (int i = 0; i < tamAmostra; i++) {
-      int operacao = 0;
-      int valor = rand() % 10000;
+      contador = 0;
+      int valor = rand() % 100000;
       valores[i] = valor;
 
       adicionar(a, valor);
-    }
+      contIns[i] += contador;
 
-    int insertCounter = contador;
-    for (int i = 0; i < tamAmostra; i++) {
-      remover(a, valores[i]);
-    } // essa bosta de remover ta cagando
-
-    if (j == loops - 1) {
-      printf("[%d, %d],", insertCounter, contador - insertCounter);
-    } else {
-      printf("[%d, %d],", insertCounter, contador - insertCounter);
+      contador = 0;
+      int randomInd = rand() % (i + 1);
+      int valorRandom = valores[randomInd];
+      remover(a, valorRandom);
+      contRem[i] += contador;
+      adicionar(a, valorRandom);
     }
-    percorrer(a->raiz,visitar);
   }
-  printf("]\n");
+
+  for (int i = 0; i < tamAmostra; i++) {
+    contIns[i] = contIns[i] / loops;
+    contRem[i] = contRem[i] / loops; 
+  }
+
+  printf("Insert\n");
+  for (int i = 0; i < tamAmostra; i++) {
+    printf("%d, ", contIns[i]);
+  }
+
+  printf("\n\nRemove\n");
+  for (int i = 0; i < tamAmostra; i++) {
+    printf("%d, ", contRem[i]);
+  }
 
   return 0;
 }

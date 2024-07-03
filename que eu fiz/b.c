@@ -79,13 +79,15 @@ int pesquisaBinaria(No* no, int chave) {
   while (inicio <= fim) {
     meio = (inicio + fim) / 2;
 
-    contador++;
     if (no->chaves[meio] == chave) {
       contador++;
       return meio;  // encontrou
     } else if (no->chaves[meio] > chave) {
+      contador++;
+      contador++;
       fim = meio - 1;
     } else {
+      contador++;
       contador++;
       inicio = meio + 1;
     }
@@ -248,23 +250,31 @@ void balancearNo(ArvoreB* arvore, No* no) {
   int posicaoNo = 0;
 
   // Localiza a posição do no atual no pai
+  contador++;
   while (pai->filhos[posicaoNo] != no && posicaoNo <= pai->total) {
     posicaoNo++;
+    contador++;
   }
 
+  contador++;
   No* irmaoEsquerdo = posicaoNo > 0 ? pai->filhos[posicaoNo - 1] : NULL;
+  contador++;
   No* irmaoDireito = posicaoNo < pai->total ? pai->filhos[posicaoNo + 1] : NULL;
 
   if (irmaoEsquerdo != NULL && irmaoEsquerdo->total > arvore->ordem) {
+    contador++;
     // Redistribui um elemento do irmão esquerdo
+    contador++;
     for (int i = no->total; i > 0; i--) {
       no->chaves[i] = no->chaves[i - 1];
       no->filhos[i + 1] = no->filhos[i];
+      contador++;
     }
     no->filhos[1] = no->filhos[0];
     no->chaves[0] = pai->chaves[posicaoNo - 1];
     no->filhos[0] = irmaoEsquerdo->filhos[irmaoEsquerdo->total];
 
+    contador++;
     if (no->filhos[0] != NULL) {
       no->filhos[0]->pai = no;
     }
@@ -274,47 +284,61 @@ void balancearNo(ArvoreB* arvore, No* no) {
     irmaoEsquerdo->total--;
     no->total++;
   } else if (irmaoDireito != NULL && irmaoDireito->total > arvore->ordem) {
+    contador++;
+    contador++;
     // Redistribui um elemento do irmão direito
     no->chaves[no->total] = pai->chaves[posicaoNo];
     no->filhos[no->total + 1] = irmaoDireito->filhos[0];
 
+    contador++;
     if (no->filhos[no->total + 1] != NULL) {
       no->filhos[no->total + 1]->pai = no;
     }
 
     pai->chaves[posicaoNo] = irmaoDireito->chaves[0];
 
+    contador++;
     for (int i = 0; i < irmaoDireito->total - 1; i++) {
       irmaoDireito->chaves[i] = irmaoDireito->chaves[i + 1];
       irmaoDireito->filhos[i] = irmaoDireito->filhos[i + 1];
+      contador++;
     }
     irmaoDireito->filhos[irmaoDireito->total - 1] =
         irmaoDireito->filhos[irmaoDireito->total];
     irmaoDireito->total--;
     no->total++;
   } else {
+    contador++;
+    contador++;
     // Fusão com o irmão, se não for possível redistribuir
     if (irmaoEsquerdo != NULL) {
+      contador++;
       // Fundir com o irmão esquerdo
       irmaoEsquerdo->chaves[irmaoEsquerdo->total] = pai->chaves[posicaoNo - 1];
       irmaoEsquerdo->total++;
 
+      contador++;
       for (int i = 0; i < no->total; i++) {
         irmaoEsquerdo->chaves[irmaoEsquerdo->total] = no->chaves[i];
         irmaoEsquerdo->filhos[irmaoEsquerdo->total] = no->filhos[i];
+        contador++;
         if (irmaoEsquerdo->filhos[irmaoEsquerdo->total] != NULL) {
           irmaoEsquerdo->filhos[irmaoEsquerdo->total]->pai = irmaoEsquerdo;
         }
         irmaoEsquerdo->total++;
+        contador++;
       }
       irmaoEsquerdo->filhos[irmaoEsquerdo->total] = no->filhos[no->total];
+      contador++;
       if (irmaoEsquerdo->filhos[irmaoEsquerdo->total] != NULL) {
         irmaoEsquerdo->filhos[irmaoEsquerdo->total]->pai = irmaoEsquerdo;
       }
 
+      contador++;
       for (int i = posicaoNo - 1; i < pai->total - 1; i++) {
         pai->chaves[i] = pai->chaves[i + 1];
         pai->filhos[i + 1] = pai->filhos[i + 2];
+        contador++;
       }
       pai->total--;
 
@@ -322,7 +346,9 @@ void balancearNo(ArvoreB* arvore, No* no) {
       free(no->filhos);
       free(no);
 
+      contador++;
       if (pai->total == 0) {
+        contador++;
         if (pai->pai == NULL) {
           arvore->raiz = irmaoEsquerdo;
           irmaoEsquerdo->pai = NULL;
@@ -334,26 +360,34 @@ void balancearNo(ArvoreB* arvore, No* no) {
         }
       }
     } else if (irmaoDireito != NULL) {
+      contador++;
+      contador++;
       // Fundir com o irmão direito
       no->chaves[no->total] = pai->chaves[posicaoNo];
       no->total++;
 
+      contador++;
       for (int i = 0; i < irmaoDireito->total; i++) {
         no->chaves[no->total] = irmaoDireito->chaves[i];
         no->filhos[no->total] = irmaoDireito->filhos[i];
+        contador++;
         if (no->filhos[no->total] != NULL) {
           no->filhos[no->total]->pai = no;
         }
         no->total++;
+        contador++;
       }
       no->filhos[no->total] = irmaoDireito->filhos[irmaoDireito->total];
+      contador++;
       if (no->filhos[no->total] != NULL) {
         no->filhos[no->total]->pai = no;
       }
 
+      contador++;
       for (int i = posicaoNo; i < pai->total - 1; i++) {
         pai->chaves[i] = pai->chaves[i + 1];
         pai->filhos[i + 1] = pai->filhos[i + 2];
+        contador++;
       }
       pai->total--;
 
@@ -361,7 +395,9 @@ void balancearNo(ArvoreB* arvore, No* no) {
       free(irmaoDireito->filhos);
       free(irmaoDireito);
 
+      contador++;
       if (pai->total == 0) {
+        contador++;
         if (pai->pai == NULL) {
           arvore->raiz = no;
           no->pai = NULL;
@@ -377,35 +413,50 @@ void balancearNo(ArvoreB* arvore, No* no) {
 }
 
 int main() {
-  int loops = 30;
-  printf("\n[");
-  for (int j = 0; j < loops; j++) {
-    ArvoreB* arvore = criaArvore(5);
-    sleep(1);
-    srand(time(0));
+  srand(time(0));
 
-    int tamAmostra = 10000;
+  int loops = 30;
+  int tamAmostra = 10000;
+  int *contIns, *contRem;
+  contIns = calloc(10000, sizeof(int));
+  contRem = calloc(10000, sizeof(int));
+
+  for (int j = 0; j < loops; j++) {
+    printf("loop %d\n", j+1);
+    ArvoreB* arvore = criaArvore(1);
+    sleep(1);
+
     int valores[tamAmostra];
-    contador = 0;
 
     for (int i = 0; i < tamAmostra; i++) {
+      contador = 0;
       int valor = rand() % 100000;
       valores[i] = valor;
 
       adicionaChave(arvore, valor);
+      contIns[i] += contador;
+
+      contador = 0;
+      int randomInd = rand() % (i + 1);
+      int valorRandom = valores[randomInd];
+      removerChave(arvore, valorRandom);
+      contRem[i] += contador;
+      adicionaChave(arvore, valorRandom);
     }
-
-    for (int i = 0; i < tamAmostra; i++) {
-      removerChave(arvore, valores[i]);
-    }  // esse lixo não funciona em arvores de outras ordens alem de 1
-
-    if (j == loops - 1) {
-      printf("%d", contador);
-    } else {
-      printf("%d, ", contador);
-    }
-
-    // percorreArvore(arvore->raiz);
   }
-  printf("]\n");
+
+  for (int i = 0; i < tamAmostra; i++) {
+    contIns[i] = contIns[i] / loops;
+    contRem[i] = contRem[i] / loops; 
+  }
+
+  printf("Insert\n");
+  for (int i = 0; i < tamAmostra; i++) {
+    printf("%d, ", contIns[i]);
+  }
+
+  printf("\n\nRemove\n");
+  for (int i = 0; i < tamAmostra; i++) {
+    printf("%d, ", contRem[i]);
+  }
 }
